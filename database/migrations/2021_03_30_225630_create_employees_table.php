@@ -20,7 +20,6 @@ class CreateEmployeesTable extends Migration
             $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade');;
             $table->foreign('position_id')->references('id')->on('positions');
             $table->string('name', 100);
-            $table->float('salary', 10, 2);
             $table->timestamps();
         });
     }

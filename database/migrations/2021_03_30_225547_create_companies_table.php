@@ -16,8 +16,8 @@ class CreateCompaniesTable extends Migration
         Schema::create('companies', function (Blueprint $table) {
             $table->id();
             $table->string('name', 100);
-            $table->string('photo', 100);
-            $table->text('description');
+            $table->string('photo', 100)->nullable();
+            $table->text('description')->nullable();
             $table->string('login', 100);
             $table->string('password', 100);
             $table->timestamps();
