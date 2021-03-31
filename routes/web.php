@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,6 +14,10 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [Controllers\CompanyController::class, 'home']);
+Route::get('/company/{id}', [Controllers\CompanyController::class, 'show']);
+
+
+Route::post('/company/{id}/saveDesc', [Controllers\CompanyController::class, 'saveDesc']);
+Route::post('/login', [Controllers\CompanyController::class, 'login'])->name('login');
+Route::post('/logout', [Controllers\CompanyController::class, 'logout'])->name('logout');
