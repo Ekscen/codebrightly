@@ -52,6 +52,11 @@
                 </ul>
             </div>
 	    @endif
+        @if(session('success'))
+            <div class="alert alert-success">
+                {{ session('success') }}
+            </div>
+        @endif
 
         <section id="content">
             @yield('content')

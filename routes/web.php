@@ -14,10 +14,13 @@ use App\Http\Controllers;
 |
 */
 
-Route::get('/', [Controllers\CompanyController::class, 'home']);
+Route::get('/', [Controllers\CompanyController::class, 'home'])->name('home');
 Route::get('/company/{id}', [Controllers\CompanyController::class, 'show']);
 
-
+Route::get('/company/{id}/delete', [Controllers\CompanyController::class, 'delete']);
 Route::post('/company/{id}/saveDesc', [Controllers\CompanyController::class, 'saveDesc']);
+Route::post('/company/{id}/savePhoto', [Controllers\CompanyController::class, 'savePhoto']);
+Route::post('/company/{id}/addComment', [Controllers\CompanyController::class, 'addComment']);
+
 Route::post('/login', [Controllers\CompanyController::class, 'login'])->name('login');
 Route::post('/logout', [Controllers\CompanyController::class, 'logout'])->name('logout');
