@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Employee;
 use App\Models\Company;
 use App\Models\Comment;
+use App\Models\Position;
 
 use Session;
 
@@ -15,7 +16,8 @@ class CompanyController extends Controller
     //
     public function home () {
         $collection = Employee::with(['company', 'position'])->get();
-        
+        $companies = [];
+        $employees = [];
         foreach ($collection as $employee) {
             $companies[$employee->company->id] = $employee->company->name;
             $employees[$employee->company->id][] = [
@@ -32,10 +34,14 @@ class CompanyController extends Controller
         $company = Company::find($id);
         $employees = $company->employees()->with('position')->get();
         $comments = $company->comments()->get();
-        return view('company', ['company' => $company, 'employees' => $employees, 'comments' => $comments]);
+        $allPositions = Position::pluck('name', 'id');
+        return view('company', ['company' => $company, 'employees' => $employees, 'comments' => $comments , 'allPositions' => $allPositions]);
     }
 
     public function saveDesc (Request $request, $id) {
+        $request->validate([
+            'description' => 'required',
+        ]);
         $company = Company::find($id);
         $company->description = $request->description;
         $company->save();
@@ -55,6 +61,9 @@ class CompanyController extends Controller
         }
     }
     public function addComment (Request $request, $id) {
+        $request->validate([
+            'comment' => 'required',
+        ]);
         $currentCompany = Session::get('company')['name'];
         $comment = new Comment([
             'comment'       =>  $request->comment,
@@ -68,6 +77,33 @@ class CompanyController extends Controller
         Company::destroy($id);
         Session::forget('company');
         return redirect('/')->with('success', 'Компания удалена');
+    }
+
+    public function addEmployee (Request $request, $id) {
+        $request->validate([
+            'name' => 'required',
+        ]);
+        $employee = new Employee ([
+            'name'          => $request->name,
+            'position_id'   => $request->position_id,
+            'company_id'    => $id,
+        ]);
+        $employee->save();
+        return redirect()->back()->with('success', 'Сотрудник добавлен');
+    }
+    public function editEmployee (Request $request, $id, $emp_id) {
+        $request->validate([
+            'name' => 'required',
+        ]);
+        $employee = Company::find($id)->employees->where('id', $emp_id)->first();
+        $employee->name = $request->name;
+        $employee->position_id = $request->position_id;
+        $employee->save();
+        return redirect()->back()->with('success', 'Данные сотрудника изменены');
+    }
+    public function deleteEmployee ($id, $emp_id) {
+        Company::find($id)->employees->where('id', $emp_id)->first()->delete();
+        return redirect()->back()->with('success', 'Сотрудник удален');
     }
 
     public function login (Request $request) {

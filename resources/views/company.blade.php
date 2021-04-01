@@ -54,30 +54,94 @@
         <tbody>
             @foreach($employees as $employee)
                 <tr>
-                    <td class="text-center">{{$employee->name}}</td>
-                    <td class="text-center">{{$employee->position->name}}</td>
-                    <td class="text-center">{{$employee->position->salary}}</td>
+                    @if(session()->get('company') && session()->get('company')['id'] === $company->id)
+                        <form action="{{ url("company/{$company->id}/editEmployee/{$employee->id}") }}" method="post">
+                            @csrf
+                            <td class="text-left">
+                                    <input class="btn btn-primary" type="submit" value="✓" title="Применить изменения">
+                                    <input type="text" name="name" value='{{$employee->name}}'>
+                            </td>
+                            <td class="text-center">
+                                <select class="form-select" name="position_id">
+                                    @foreach($allPositions as $key => $name)
+                                        <option value="{{$key}}" @if($key == $employee->position->id) selected @endif>{{$name}}</option>
+                                    @endforeach
+                                </select>
+                            </td>
+                            <td class="text-right">
+                                {{$employee->position->salary}}
+                                <a href='{{url("company/{$company->id}/deleteEmployee/{$employee->id}")}}' title="Удалить сотрудника" class="btn btn-danger mx-2">X</a>
+                            </td>
+                        </form>
+                    @else
+                        <td class="text-center">
+                            {{$employee->name}}
+                        </td>
+                        <td class="text-center">
+                            {{$employee->position->name}}
+                        </td>
+                        <td class="text-center">
+                            {{$employee->position->salary}}
+                        </td>
+                    @endif
                 </tr>
             @endforeach
+            @if(session()->get('company') && session()->get('company')['id'] === $company->id)
+                <tr>
+                    <form action='{{url("company/{$company->id}/addEmployee")}}' method="post">
+                        @csrf
+                        <td class="text-left">
+                            <input type="text" name="name">
+                        </td>
+                        <td class="text-center">
+                            <select class="form-select" name="position_id">
+                                @foreach($allPositions as $key => $name)
+                                    <option value="{{$key}}">{{$name}}</option>
+                                @endforeach
+                            </select>
+                        </td>
+                        <td class="text-right">
+                            <input type="submit" class="btn btn-primary" value="Добавить сотрудника">
+                        </td>
+                    </form>
+                </tr>
+            @endif
         </tbody>
     </table>
     @if(session()->get('company'))
         <h2 class="mb-3">Комментарии</h2>
-        <div class="d-flex justify-content-center flex-column ">
-            @foreach($comments as $comment)
-                <div class="p-3 m-1 bg-dark w-100 rounded" >
-                    <div class="text-light d-flex m-1 justify-content-around">
-                        <div>{{$comment->creator_name}}</div>
-                        <div>{{$comment->created_at}}</div>
-                    </div>
-                    <div class="d-flex justify-content-center">
-                        <div class="text-light m-1">
-                            {{$comment->comment}}
-                        </div>
-                    </div>
-                </div>
-            @endforeach
-        </div>
+        <table class="table table-responsive-sm mt-1">
+            <thead class="thead-dark">
+                <tr>
+                    <th class="text-center" scope="col" name="name">
+                        <span>
+                            Компания
+                        </span>
+                    </th>
+                    <th class="text-center" scope="col" name="position">
+                        <span>
+                            Комментарий
+                        </span>
+                    </th>
+                    <th class="text-center" scope="col" name="salary">
+                        <span>
+                            Дата
+                        </span>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($comments as $comment)
+                    <tr>
+                        <td class="text-center">{{$comment->creator_name}}</td>
+                        <td class="text-center text-break">
+                                {{$comment->comment}}
+                        </td>
+                        <td class="text-center">{{$comment->created_at}}</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
         <form action='{{url("company/{$company->id}/addComment")}}' method="post" class="w-100">
             @csrf
             <textarea class="w-100" name="comment" id="comment"></textarea>
